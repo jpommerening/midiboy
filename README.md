@@ -12,7 +12,7 @@ the affordable [ATtiny2313(a)][attiny2313a] microcontroller (µC).
 
 - Starts in Omni-Mode, learns MIDI channel at the press of a button.
 - Clock jitter correction
-- Standalone clock
+- Standalone clock with tap-tempo
 - Sysex programmable
 
 ## Requirements

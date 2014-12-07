@@ -1,4 +1,5 @@
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include <util/delay.h>
 
 #ifdef DEBUG
@@ -13,7 +14,8 @@ SIMINFO_SERIAL_IN("B3",STR(DATA),BAUD);
 #include "midi.h"
 
 int main( void ) {
-  DDRB = 0x1f; // PB0 - PB04 = out
+  DDRB = 0x0f;
+  PORTB = 0x30;
 
   midi_t mport;
 
@@ -21,16 +23,13 @@ int main( void ) {
   mport.omni = 1;
   mport.chan = 0;
 
+  //midi_init( &mport );
   uint8_t x = 0;
 
-  midi_init( &mport );
-
   while (1) {
-    _delay_ms( 1000 );
-    PORTB = x;
-    x = (x+1) & 0x03;
+    x = (PINB & 0x30) >> 4;
+    PORTB = x | 0x30;
   }
 
   return 0;
 }
-
