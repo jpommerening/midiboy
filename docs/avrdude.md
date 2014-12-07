@@ -16,13 +16,13 @@ from _engbedded_.
 To write the fuse bits use the following command (subsitute the `usbasp` with
 the device you're using):
 
-```command
+```console
 ~/midiboy $ avrdude -c usbasp -pt2313 -U lfuse:w:0xce:m
 ```
 
 After that we can upload the firmware to the connected microcontroller using
 the following command:
 
-```command
+```console
 ~/midiboy $ avrdude -c usbasp -pt2313 -U midiboy.elf
 ```
