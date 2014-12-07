@@ -18,6 +18,19 @@ the device you're using):
 
 ```console
 ~/midiboy $ avrdude -c usbasp -pt2313 -U lfuse:w:0xce:m
+
+avrdude: AVR device initialized and ready to accept instructions
+
+Reading | ################################################## | 100% 0.02s
+
+avrdude: Device signature = 0x1e910a
+avrdude: reading input file "0xce"
+avrdude: writing lfuse (1 bytes):
+
+...
+
+avrdude done.  Thank you.
+
 ```
 
 After that we can upload the firmware to the connected microcontroller using
@@ -25,4 +38,21 @@ the following command:
 
 ```console
 ~/midiboy $ avrdude -c usbasp -pt2313 -U midiboy.elf
+
+avrdude: AVR device initialized and ready to accept instructions
+
+Reading | ################################################## | 100% 0.02s
+
+avrdude: Device signature = 0x1e910a
+avrdude: NOTE: "flash" memory has been specified, an erase cycle will be performed
+         To disable this feature, specify the -D option.
+avrdude: erasing chip
+avrdude: reading input file "midiboy.elf"
+avrdude: input file midiboy.elf auto detected as ELF
+avrdude: writing flash (216 bytes):
+
+...
+
+avrdude done.  Thank you.
+
 ```
