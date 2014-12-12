@@ -17,7 +17,7 @@ To write the fuse bits use the following command (subsitute the `usbasp` with
 the device you're using):
 
 ```console
-~/midiboy $ avrdude -c usbasp -pt2313 -U lfuse:w:0xce:m
+midiboy:~ $ avrdude -c usbasp -p t2313 -U lfuse:w:0xce:m
 
 avrdude: AVR device initialized and ready to accept instructions
 
@@ -30,14 +30,13 @@ avrdude: writing lfuse (1 bytes):
 ...
 
 avrdude done.  Thank you.
-
 ```
 
 After that we can upload the firmware to the connected microcontroller using
 the following command:
 
 ```console
-~/midiboy $ avrdude -c usbasp -pt2313 -U midiboy.elf
+midiboy:~ $ avrdude -c usbasp -p t2313 -U midiboy.elf
 
 avrdude: AVR device initialized and ready to accept instructions
 
@@ -54,5 +53,4 @@ avrdude: writing flash (216 bytes):
 ...
 
 avrdude done.  Thank you.
-
 ```
