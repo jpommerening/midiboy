@@ -1,9 +1,15 @@
+#ifndef __MIDI_H
+#define __MIDI_H
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 #include <stddef.h>
 #include <stdint.h>
 
 #define MIDI_MSG_INIT { 0 }
 #define MIDI_MSG_INIT_STATUS(status) { .data = { status, 0, 0, 0 } }
-#define MIDI_IN_INIT { 0, 1, 0, 0, 0, 0, MIDI_MSG_INIT, NULL, NULL }
+#define MIDI_IN_INIT { 0, 1, 0, 0, 0, 0, MIDI_MSG_INIT, NULL, NULL, NULL }
 #define MIDI_OUT_INIT {}
 
 #define _MIDI_MSG_BYTE(msg,n) ((uint8_t*) (&msg))[n]
@@ -47,7 +53,7 @@ typedef union {
     unsigned chan : 4;
     uint8_t  data[3];
   } voice;
-  struct packed {
+  struct {
     uint8_t type;
     uint8_t data[3];
   } common;
@@ -68,4 +74,26 @@ struct midi_in_s {
 
   midi_recv_cb recv;
   midi_recv_cb recv_rt;
-};
+  void* info;
+} __attribute__((__packed__));
+
+struct midi_out_s {
+  unsigned chan : 4;
+  unsigned lock : 1;
+  unsigned sysx : 1;
+  unsigned _pad : 2;
+
+  unsigned mlen : 4;
+  unsigned moff : 4;
+  midi_msg_t msg;
+
+  void* info;
+} __attribute__((__packed__));
+
+void midi_recv( midi_in_t* in, uint8_t byte );
+void midi_poll( midi_in_t* in );
+
+#if defined(__cplusplus)
+}
+#endif
+#endif

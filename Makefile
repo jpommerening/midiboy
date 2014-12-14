@@ -6,10 +6,10 @@ DATA = mididata
 
 MKDIR_P = mkdir -p
 CC = avr-gcc
-CPPFLAGS = -DMCU=$(MCU) -DF_CPU=$(F_CPU) -DBAUD=$(BAUD) -DDATA=$(DATA)
+CPPFLAGS = -DMCU=$(MCU) -DF_CPU=$(F_CPU) -DBAUD=$(BAUD) -DDATA=$(DATA) -Wall -Wextra
 CFLAGS = -g -DDEBUG -mmcu=$(MCU) -O2 -Wl,--section-start=.siminfo=0x900000
 
-OBJS = main.o midi.o
+OBJS = main.o midi.o clock.o
 DEPS = $(OBJS:%.o=%.d)
 BIN = midiboy.elf
 

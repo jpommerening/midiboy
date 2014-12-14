@@ -58,7 +58,7 @@ static void _midi_recv_rt( midi_in_t* in, const uint8_t byte ) {
  */
 void midi_recv( midi_in_t* in, const uint8_t byte ) {
   int8_t info = midi_peek(byte);
-  if (info == REALTIME) {
+  if (info == (int8_t)REALTIME) {
     _midi_recv_rt(in, byte);
   } else if (info == 0) {
     if (in->sysx) {
@@ -73,11 +73,11 @@ void midi_recv( midi_in_t* in, const uint8_t byte ) {
     in->msg.data[0] = byte;
     in->mlen = info;
     in->moff = 1;
-  } else if (info == SYSEX_START) {
+  } else if (info == (int8_t)SYSEX_START) {
     in->sysx = 1;
-  } else if (info == SYSEX_END) {
+  } else if (info == (int8_t)SYSEX_END) {
     in->sysx = 0;
-  } else if (info == UNDEFINED) {
+  } else if (info == (int8_t)UNDEFINED) {
     in->mlen = 0;
     in->moff = 0;
   } else {
