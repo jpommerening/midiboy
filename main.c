@@ -20,8 +20,16 @@ SIMINFO_SERIAL_IN("B3",STR(DATA),BAUD);
 #define MIDI_BAUD 31250
 #define MIDI_UBRR ((F_CPU16/MIDI_BAUD) - 1)
 
+#include "midi.h"
+
 static uint8_t frame = 0;
-static uint8_t msg = 0;
+static midi_in_t in = MIDI_IN_INIT;
+
+static void recv( midi_in_t* in, const midi_msg_t msg ) {
+  if (MIDI_STATUS(msg) == CLOCK) {
+    frame = (frame + 1) % 24;
+  }
+}
 
 int main( void ) {
   DDRB = 0x0f;
@@ -29,6 +37,8 @@ int main( void ) {
 
   uint8_t x = 0;
   uint16_t blink = 0;
+
+  in.recv_rt = &recv;
 
   PORTB = LED1RED | LED2RED | 0x30;
 
@@ -51,7 +61,6 @@ int main( void ) {
     }
     if (frame == 0) {
       blink = 15000;
-      msg = 0;
     }
   }
 
@@ -59,8 +68,7 @@ int main( void ) {
 }
 
 ISR(USART0_RX_vect) {
-  msg = UDR;
-  frame = (++frame) % 24;
+  midi_recv(in, UDR);
 }
 
 ISR(USART0_TX_vect) {

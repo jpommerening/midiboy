@@ -1,33 +1,7 @@
-#include <avr/io.h>
-#include <avr/interrupt.h>
 #include "midi.h"
 
-#define F_CPU16 (F_CPU/16)
-#define MIDI_BAUD 31250
-#define MIDI_UBRR (F_CPU16/MIDI_BAUD) - 1
-
-/* setup uart and interrupts */
-void midi_init( midi_t* port ) {
-  UBRRH = (unsigned char) ((MIDI_UBRR >> 8) & 0x0f);
-  UBRRL = (unsigned char) (MIDI_UBRR & 0xff);
-
-  // asynchronous (UMSEL1..0 = 00)
-  // no parity (UPM1..0 = 00)
-  // 1 stop bit (USBS = 0)
-  // 8 bits (UCSZ1..0 = 11)
-  // falling XCK edge (UCPOL = 0)
-  UCSRC = (1<<UCSZ0) | (1<<UCSZ1);
-
-  // (maybe) enable receive, transmit + interrupts
-  UCSRB = ((port->rxen) << RXEN) | ((port->rxen) << RXCIE)
-        | ((port->txen) << TXEN) | ((port->txen) << TXCIE);
-}
-
-ISR(USART0_RX_vect) {
-}
-
-ISR(USART0_TX_vect) {
-}
+#define REALTIME 0xf0
+#define UNDEFINED 0xf1
 
 /**
  * Determine how to handle the incoming message.
@@ -37,26 +11,43 @@ ISR(USART0_TX_vect) {
  *         start of a midi message.
  * @return zero if the byte is a data-byte of another
  *         midi-message
- * @return -1 for reserved messages
- * @return -2 for sysex messages
+ * @return REALTIME for realtime messages
+ * @return UNDEFINED for reserved messages
+ * @return SYSEX_START for sysex start messages
+ * @return SYSEX_END for sysex end messages
  */
 int8_t midi_peek( const uint8_t byte ) {
-  static const int8_t msg_size_voice[8] = {
+  static const int8_t msg_info_voice[7] = {
     3, 3, 3, 3,
-    2, 2, 3, -1
+    2, 2, 3
   };
-  static const int8_t msg_size_common[16] = {
-    -2, 2, 3, 2,
-    -1, -1, 1, 1,
-    1, -1, 1, 1,
-    1, -1, 1, 1
+  static const int8_t msg_info_common[16] = {
+    SYSEX_START, 2, 3, 2,
+    UNDEFINED, UNDEFINED, 1, SYSEX_END,
+    REALTIME, UNDEFINED, REALTIME, REALTIME,
+    REALTIME, UNDEFINED, REALTIME, REALTIME
   };
   if (byte < 0x80) {
     return 0;
   } else if (byte < 0xf0) {
-    return msg_size_voice[(byte>>4) & 0x07];
+    return msg_info_voice[(byte>>4) & 0x07];
   } else {
-    return msg_size_common[byte & 0x0f];
+    return msg_info_common[byte & 0x0f];
+  }
+}
+
+static void _midi_recv( midi_in_t* in, const midi_msg_t msg ) {
+  if (in->recv != NULL) {
+    in->recv(in, msg);
+  }
+}
+
+static void _midi_recv_rt( midi_in_t* in, const uint8_t byte ) {
+  midi_msg_t msg = MIDI_MSG_INIT_STATUS(byte);
+  if (in->recv_rt != NULL) {
+    in->recv_rt(in, msg);
+  } else {
+    _midi_recv(in, msg);
   }
 }
 
@@ -66,31 +57,38 @@ int8_t midi_peek( const uint8_t byte ) {
  * @param byte the byte that was received
  */
 void midi_recv( midi_in_t* in, const uint8_t byte ) {
-  int8_t len = midi_peek( byte );
-  if (len == 0) {
+  int8_t info = midi_peek(byte);
+  if (info == REALTIME) {
+    _midi_recv_rt(in, byte);
+  } else if (info == 0) {
     if (in->sysx) {
       /* handle sysex data */
     } else {
       in->msg.data[in->moff++] = byte;
+      if (in->moff >= sizeof(in->msg)) {
+        in->moff = 0;
+      }
     }
-  } else if (len > 0) {
-    if (/* realtime? */ 0) {
-      /* handle realtime signals immediately */
-    } else {
-      in->msg.data[0] = byte;
-      in->mlen = len;
-      in->moff = 1;
-    }
-  } else if (len < 0) {
+  } else if (info > 0) {
+    in->msg.data[0] = byte;
+    in->mlen = info;
+    in->moff = 1;
+  } else if (info == SYSEX_START) {
+    in->sysx = 1;
+  } else if (info == SYSEX_END) {
+    in->sysx = 0;
+  } else if (info == UNDEFINED) {
     in->mlen = 0;
     in->moff = 0;
+  } else {
+    /* this should never happen */
   }
 }
 
 void midi_poll( midi_in_t* in ) {
   if (in->mlen == in->moff && in->mlen > 0) {
     /* handle message */
-    in->recv( in, in->msg );
+    _midi_recv(in, in->msg);
     /* prepare for rolling status */
     in->moff = 1;
   }
