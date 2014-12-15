@@ -17,6 +17,7 @@ SIMINFO_SERIAL_IN("B3",STR(DATA),BAUD);
 #define LED2GREEN 0x08
 
 #define F_CPU16 (F_CPU/16)
+#define F_CPU64 (F_CPU/64)
 #define MIDI_BAUD 31250
 #define MIDI_UBRR ((F_CPU16/MIDI_BAUD) - 1)
 
@@ -48,9 +49,17 @@ ISR (USART0_TX_vect) {
  * OCR1AH and OCR1AL define the "modulus" for the timer and thus
  * the interrupt interval.
  * OCIE1A enables the interrupt fired, when OSC1A is exceeded.
- * Since all of these happen way to fast for 24ppm at a reasonable bpm,
- * an internal counter is "filled" to trigger the actual clock events.
+ * Each compare match triggers one of the 24 clock signals per beat.
+ * We subdivide the internal 10MHz clock by 64, thus obtaining 156250
+ * ticks per second. Because the counter overflows at 65536, we can get
+ * as low as about 2.3 pulses per second, which equals a little less than
+ * 6bpm. Subdividing that one pulse with the 16bits gives a resolution of
+ * about 1.6KHz.
  */
+
+#define BPM_TO_CLCK(bpm) (bpm*24./60.)
+#define BPM_TO_SAMP(bpm) ((uint16_t) (F_CPU64/BPM_TO_CLOCK(bpm)))
+
 ISR (TIMER1_COMPA_vect) {
 }
 ISR (TIMER1_OVF_vect) {
@@ -67,10 +76,17 @@ void setup( void ) {
   DDRB = 0x0f;
   PORTB = 0x30;
 
+  /* setup UART for MIDI */
   UBRRH = (uint8_t) ((MIDI_UBRR >> 8) & 0x0f);
   UBRRL = (uint8_t) (MIDI_UBRR & 0xff);
   UCSRC = (1<<UCSZ0) | (1<<UCSZ1);
   UCSRB = (1<<RXEN) | (1<<RXCIE);
+
+  /* setup timer1 for clock generation */
+  TCCR1A = 0;
+  TCCR1B = (1<<WGM13) | (1<<WGM12) | (1<<CS11)  | (1<<CS10);
+  TCCR1C = 0;
+  TIMSK = (1<<TOIE1) | (1<<OCIE1A);
 }
 
 void loop( void ) {
