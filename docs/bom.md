@@ -11,3 +11,5 @@ Qty | Reference | Item Description
   1 | R1        | 220Ω 1%
   1 | R2        | 5.6kΩ 1%
   1 | R3        | 1.2kΩ 1%
+
+![CC BY-SA 4.0](cc-by-sa-80x15.png "Creative Commons Attribution-ShareAlike 4.0 International")

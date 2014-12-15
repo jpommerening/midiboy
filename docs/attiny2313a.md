@@ -7,3 +7,5 @@ larger than the alternatives and allows through-hole soldering.
 
 The ATtiny2313a has 2KB of flash memory as well as 128B (yes, bytes) of EEPROM
 and RAM each. Driven by an external oscillator it can operate at up to 20MHz.
+
+![CC BY-SA 4.0](cc-by-sa-80x15.png "Creative Commons Attribution-ShareAlike 4.0 International")

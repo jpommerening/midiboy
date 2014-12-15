@@ -43,7 +43,11 @@ and a power supply. Also, a soldering iron and something to etch and drill your 
 [simulavr]: http://www.nongnu.org/simulavr/
 [attiny2313a]: http://www.atmel.com/devices/attiny2313a.aspx
 
-## [License](LICENSE-BSD) (BSD)
+<header>
+## License
+> Sourcecode: [BSD](LICENSE-BSD) (below)
+> Documentation: [CC BY-SA 4.0](docs/LICENSE-CC-BY-SA-4.0)
+</header>
 
 Copyright &copy; 2014, Jonas Pommerening <jonas.pommerening@gmail.com>
 All rights reserved.
