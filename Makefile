@@ -1,6 +1,6 @@
 
 MCU = attiny2313a
-F_CPU = 10000000UL
+F_CPU = 8000000UL
 BAUD = 31250
 DATA = mididata
 

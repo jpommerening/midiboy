@@ -45,7 +45,7 @@ and a power supply. Also, a soldering iron and something to etch and drill your 
 
 <header>
 ## License
-> Sourcecode: [BSD](LICENSE-BSD) (below)
+> Sourcecode: [BSD](LICENSE-BSD) (below)  
 > Documentation: [CC BY-SA 4.0](docs/LICENSE-CC-BY-SA-4.0)
 </header>
 

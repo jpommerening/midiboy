@@ -3,37 +3,57 @@
 Once you've connected your programmer and the programmer to the ISP headers of
 your board, you're almost ready to write the _MIDIboy_ firmware to the flash.
 
-But first, to make sure your controller is driven by the external clock and
-uses its pins the way it's supposed to, we have to set the so-called fuse-bits.
+## Reading and writing fuse bits
 
-These are written byte-wise. We're mostly concerned with the "low" byte, which
-is used to specify the kind of clock the chip is using. To use an external
-crystal oscillator with 8MHz or more we need to set the CKSEL bits to `1110`.
-To turn this information into the hexadecimal notation AVRDUDE understands,
-we can use the online [fuse calculator](http://www.engbedded.com/fusecalc/)
-from _engbedded_.
+Out of the box, the ATtiny2313a microcontroller usually has all the right
+fuse bits set. The fuse bits are system-wide settings, usually related to
+the hardware and capabilities of the microcontroller. For example, if you want
+to use an external clock source, like a crystal oscillator, you would have to
+set the CKSEL bits. To be sure they have the correct values, you can read and
+write their contents with AVRDUDE.
 
-To write the fuse bits use the following command (subsitute the `usbasp` with
-the device you're using):
+The fuses are written byte-wise. We're mostly concerned with the "low" byte,
+which is used to specify the kind of clock the chip is using. The "low" fuse
+should read `0x64`; the "high" fuse should read `0xdf`.
+
+To decode the output, or to easily turn the the information from the datasheet
+into the hexadecimal notation AVRDUDE understands, you can use the online
+[fuse calculator](http://www.engbedded.com/fusecalc/) from _engbedded_.
+
+To read the fuse bits use the following command (subsitute the `usbasp` with
+the device you're using, and make sure it is connected):
 
 ```console
-midiboy:~ $ avrdude -c usbasp -p t2313 -U lfuse:w:0xce:m
+midiboy:~ $ avrdude -c usbasp -p t2313 -U lfuse:r:-:m -U hfuse:r:-:m
 
 avrdude: AVR device initialized and ready to accept instructions
 
 Reading | ################################################## | 100% 0.02s
-
-avrdude: Device signature = 0x1e910a
-avrdude: reading input file "0xce"
-avrdude: writing lfuse (1 bytes):
 
 ...
 
 avrdude done.  Thank you.
 ```
 
-After that we can upload the firmware to the connected microcontroller using
-the following command:
+If the output does not match the listing above (if the fuse values do not match)
+use the following command to write the correct values:
+
+```console
+midiboy:~ $ avrdude -c usbasp -p t2313 -U lfuse:w:0x64:m -U hfuse:w:0xdf:m
+
+avrdude: AVR device initialized and ready to accept instructions
+
+Reading | ################################################## | 100% 0.02s
+
+...
+
+avrdude done.  Thank you.
+```
+
+## Uploading the firmware
+
+Once you are sure the fuse bits are correctly set, you can upload the firmware to
+the connected microcontroller using the following command:
 
 ```console
 midiboy:~ $ avrdude -c usbasp -p t2313 -U midiboy.elf
