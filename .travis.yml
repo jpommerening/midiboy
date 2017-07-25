@@ -11,4 +11,5 @@ install:
 script:
   - docker run simavr &
     PID=$? ;
-    sleep 10 && kill -TERM $PID
+    sleep 10 && kill -TERM $PID ;
+    true
