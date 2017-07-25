@@ -10,6 +10,6 @@ install:
 
 script:
   - docker run simavr &
-    PID=$? ;
+    PID=$! ;
     sleep 10 && kill -TERM $PID ;
     true
