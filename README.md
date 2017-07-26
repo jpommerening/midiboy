@@ -18,12 +18,15 @@ the affordable [ATtiny2313(a)][attiny2313a] microcontroller (µC).
 ## Requirements
 
 To compile the code in this repository, you need a proper C compiler. Luckily, the
-open source compiler suite GCC ships with great AVR support. If you're using a Mac,
-you can use my [Homebrew tap](/jpommerening/homebrew-avr). Windows users can use the
-ready-to-use [WinAVR][]. Everyone else probably doesn't need my help to get up and
-running.
+open source compiler suite GCC ships with great AVR support.
+This repository includes a [Dockerfile](Dockerfile) to build an image with GCC and
+SimAVR.
+You can find more details about that in the [documentation](docs/docker.md).
+If you're using a Mac, you can also use [Homebrew](/osx-cross/homebrew-avr). Windows
+users can try the ready-to-use [WinAVR][].
+Everyone else probably doesn't need my help to get up and running.
 If you are not ready to go hardware with it and just want to give it a try, you can
-use [SimulAVR][].
+use [SimAVR][].
 To transfer the compiled binary to the microcontroller you need a hardware programmer
 and software. I'm using [USBasp][] connected to a breadboard and [AVRDUDE][].
 Finally, besides the microcontroller, you need some electric components, maybe a case
@@ -33,14 +36,16 @@ and a power supply. Also, a soldering iron and something to etch and drill your 
 
 - [About the ATtiny2313a](docs/attiny2313a.md)
 - [Bill of materials](docs/bom.md)
+- [Circuit diagram](docs/schematic.md)
 - [PCB layout](docs/pcb.md)
-- [Using SimulAVR for simulation](docs/simulavr.md)
+- [About the Docker image](docs/docker.md)
+- [Using SimAVR for simulation](docs/simavr.md)
 - [Using AVRDUDE to program the µC](docs/avrdude.md)
 
 [winavr]: http://www.mikrocontroller.net/articles/WinAVR
 [usbasp]: http://www.fischl.de/usbasp/
 [avrdude]: http://www.nongnu.org/avrdude/
-[simulavr]: http://www.nongnu.org/simulavr/
+[simavr]: https://github.com/buserror/simavr
 [attiny2313a]: http://www.atmel.com/devices/attiny2313a.aspx
 
 ## License
