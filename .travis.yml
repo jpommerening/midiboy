@@ -5,11 +5,15 @@ language: c
 services:
   - docker
 
-install:
+before_install:
   - docker build -t simavr .
 
+install:
+  - docker run -v $TRAVIS_BUILD_DIR:/build simavr all
+
 script:
-  - docker run simavr &
+  - docker run -v $TRAVIS_BUILD_DIR:/build simavr test &
     PID=$! ;
-    sleep 10 && kill -TERM $PID ;
+    sleep 10 ;
+    kill -TERM $PID ;
     true

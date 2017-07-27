@@ -13,12 +13,8 @@ RUN apk add openssl ca-certificates gcc libc-dev libelf libelf-dev git bash \
  && apk del gcc libelf-dev libc-dev bash \
  && rm -r simavr-1.5
 
-ENTRYPOINT [ "simavr" ]
-
 RUN mkdir /build
-ADD . /build
 WORKDIR /build
+VOLUME /build
 
-RUN make
-
-CMD [ "-m", "attiny2313", "-f", "8000000", "midiboy.elf" ]
+ENTRYPOINT [ "make" ]
